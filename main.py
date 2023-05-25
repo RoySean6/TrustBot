@@ -29,10 +29,15 @@ def add_user(message):
         username = message.text.split(' ')[1]
         conn = sqlite3.connect('users.db')
         c = conn.cursor()
-        c.execute("INSERT INTO users VALUES (?)", (username,))
-        conn.commit()
-        conn.close()
-        bot.reply_to(message, "骗子添加成功!")
+        c.execute("SELECT * FROM users WHERE username=?", (username,))
+        result = c.fetchone()
+        if not result:
+            c.execute("INSERT INTO users VALUES (?)", (username,))
+            conn.commit()
+            conn.close()
+            bot.reply_to(message, "骗子添加成功!")
+        else:
+            bot.reply_to(message, "已存在，勿重复添加")
 
 @bot.message_handler(commands=['remove_user'])
 def remove_user(message):
@@ -42,10 +47,11 @@ def remove_user(message):
         c = conn.cursor()
         c.execute("SELECT * FROM users WHERE username=?", (username,))
         result = c.fetchone()
+
         if result:
             c.execute("DELETE FROM users WHERE username=?", (username,))
             conn.commit()
-            bot.reply_to(message, "骗子添加成功!")
+            bot.reply_to(message, "删除成功!")
         else:
             bot.reply_to(message, "用户不存在!")
         conn.close()
@@ -65,6 +71,7 @@ def check_and_compress_log(log_filename):
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def send_message(message):
+    #print(message)
     if message.chat.type == 'group':
         save_message_to_log(message)
         username = message.from_user.username
