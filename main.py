@@ -9,7 +9,7 @@ load_dotenv()
 
 bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN'))
 admin_id = int(os.getenv('ADMIN_ID'))  # 管理员用户 ID, 可在配置文件中指定
-reply_message = os.getenv('REPLY_MESSAGE', '注意！一个可疑的骗子发送了一条消息')
+reply_message = os.getenv('REPLY_MESSAGE', 'Attention!!! A damn scammer has sent a message')
 
 def create_table_if_not_exists():
     conn = sqlite3.connect('users.db')
@@ -32,7 +32,7 @@ def add_user(message):
         c.execute("INSERT INTO users VALUES (?)", (username,))
         conn.commit()
         conn.close()
-        bot.reply_to(message, "用户添加成功!")
+        bot.reply_to(message, "骗子添加成功!")
 
 @bot.message_handler(commands=['remove_user'])
 def remove_user(message):
@@ -45,7 +45,7 @@ def remove_user(message):
         if result:
             c.execute("DELETE FROM users WHERE username=?", (username,))
             conn.commit()
-            bot.reply_to(message, "用户删除成功!")
+            bot.reply_to(message, "骗子添加成功!")
         else:
             bot.reply_to(message, "用户不存在!")
         conn.close()
