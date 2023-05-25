@@ -1,5 +1,4 @@
 .venv
 .env
 *.log
-*.txt
 *.db
