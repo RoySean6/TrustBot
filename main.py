@@ -9,7 +9,8 @@ load_dotenv()
 
 bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN'))
 admin_id = int(os.getenv('ADMIN_ID'))  # 管理员用户 ID, 可在配置文件中指定
-reply_message = os.getenv('REPLY_MESSAGE','Attention!!! A damn scammer has sent a message')
+reply_message = os.getenv('REPLY_MESSAGE', '注意！一个可疑的骗子发送了一条消息')
+
 def create_table_if_not_exists():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -39,10 +40,15 @@ def remove_user(message):
         username = message.text.split(' ')[1]
         conn = sqlite3.connect('users.db')
         c = conn.cursor()
-        c.execute("DELETE FROM users WHERE username=?", (username,))
-        conn.commit()
+        c.execute("SELECT * FROM users WHERE username=?", (username,))
+        result = c.fetchone()
+        if result:
+            c.execute("DELETE FROM users WHERE username=?", (username,))
+            conn.commit()
+            bot.reply_to(message, "用户删除成功!")
+        else:
+            bot.reply_to(message, "用户不存在!")
         conn.close()
-        bot.reply_to(message, "用户删除成功!")
 
 def save_message_to_log(message):
     log_filename = "group_messages.log"
