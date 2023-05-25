@@ -65,7 +65,6 @@ def check_and_compress_log(log_filename):
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def send_message(message):
-    print(message)
     if message.chat.type == 'group':
         save_message_to_log(message)
         username = message.from_user.username
